@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+echo "Parameters: tpl l d szereg galezie nazwa"
+
+#turns per layer
+if [[ ! $1 ]]; then
+   tpl=35
+else
+   tpl=$1
+fi
+
+#number of layers
+if [[ ! $2 ]]; then
+   l=2
+else
+   l=$2
+fi
+
+#wire diameter
+if [[ ! $3 ]]; then
+   d=3
+else
+   d=$3
+fi
+
+#kond w szeregu
+if [[ ! $4 ]]; then
+   szereg=2
+else
+   szereg=$4
+fi
+
+#il glezi
+if [[ ! $5 ]]; then
+   galaz=1
+else
+   galaz=$5
+fi
+
+
+#first measure current
+i=1
+
+#single capacitor max voltage
+voltage=450
+
+#single capacitor capacitance
+capacitance=22    
+
+voltage=$(($voltage*$szereg))
+capacitance=`echo "$galaz*$capacitance/$szereg" | bc -l`
+
+#nazwa
+nazwa="obecny"
+
+octave ./scripts/coil.m $tpl $l $d $i
+
+L=`sed -n '4p' ./temp/LandDCR.txt`
+R=`sed -n '9p' ./temp/LandDCR.txt`
+LL=`printf 'L2 6 1 %smH IC=0' "$L"`
+RR=`printf 'R2 7 6 %sm' "$R"`
+VV=`printf 'VS1 4 0 DC %s' "$voltage"`
+CC=`printf 'C1 5 0 %smF' "$capacitance"`
+sed -i "2s/.*/$LL/" ./scripts/MaxCurrent.net
+sed -i "3s/.*/$RR/" ./scripts/MaxCurrent.net
+sed -i "4s/.*/$VV/" ./scripts/MaxCurrent.net
+sed -i "5s/.*/$CC/" ./scripts/MaxCurrent.net
+
+
+ngspice -b ./scripts/MaxCurrent.net -o ./temp/MaxCurrent.txt
+
+Imax=`sed -n '28p' ./temp/MaxCurrent.txt`
+Imax=${Imax:7}
+
+
+octave ./scripts/coil.m $tpl $l $d $Imax
+
+Bmax=`sed -n '152p' ./temp/numeric.txt`
+Bmax=${Bmax:16:15}
+
+
+wynik="Bmax=${Bmax}, tpl=${tpl}, l=${l}, d=${d}, Imax=${Imax}, Vtot=${voltage}, Ctot=${capacitance}, w szeregu=${szereg}, il. galezi=${galaz}, nazwa=${nazwa}"
+echo $wynik
+
+if [ ! -e ./output.txt ]; then
+   echo $wynik > ./output.txt
+else
+   sed -i '1i\'"$wynik" ./output.txt
+fi

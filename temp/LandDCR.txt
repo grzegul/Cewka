@@ -1,0 +1,11 @@
+# Created by Octave 4.0.0, Thu Mar 16 13:39:34 2017 CET <jakubgrzegulski@grzegul-OptiPlex-9020>
+# name: inductance
+# type: global scalar
+0.2673913164572839
+
+
+# name: resistance
+# type: global scalar
+61.67028661993925
+
+

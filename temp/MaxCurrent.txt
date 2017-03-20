@@ -1,0 +1,29 @@
+
+Circuit: * spice netlister for gnetlist
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+6                                          900
+1                                          900
+7                                          900
+4                                          900
+5                                          900
+8                                          900
+vf2                                      9e-09
+3                                            0
+l1#branch                          8.99999e-07
+l2#branch                                9e-07
+vg1#branch                                   0
+vs1#branch                        -9.00005e-07
+
+
+
+No. of Data Rows : 74
+imax = 4.011648e+03
+ngspice-26 done
